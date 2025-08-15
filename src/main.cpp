@@ -1,4 +1,6 @@
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
@@ -10,24 +12,35 @@
 using namespace sf;
 using namespace std;
 
-#define BOARD_SIZE 10
+#define BOARD_SIZE 20
 #define CELL_SIZE 40
+#define SPEED_TIME 5
 
-enum cellcase{
+int dirSpawnTimer = 0;
+
+enum celltype{
     EMPTY,
     BODY,
     FOOD,
     HEAD
 };
 
+enum direction{
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+};
+
 class cell{
 public:
-    cellcase type;
+    celltype type;
+    direction dir;
     RectangleShape shape;
 
-    cell(cellcase t = EMPTY) : type(t) {
+    cell(celltype t = EMPTY, direction d = UP) : type(t), dir(d) {
         shape.setSize(Vector2f(CELL_SIZE, CELL_SIZE));
-        //shape.setFillColor(Color::White);
+        shape.setFillColor(Color::Magenta);
     }
 
 };
@@ -56,7 +69,7 @@ public:
                     cells[i][j].shape.setFillColor(Color::Red);
                 } else if(cells[i][j].type == HEAD){
                     cells[i][j].shape.setFillColor(Color::Green);
-                } else {
+                } else if(cells[i][j].type == EMPTY){
                     cells[i][j].shape.setFillColor(Color::White);
                 }
                 // Draw the cell
@@ -64,6 +77,123 @@ public:
             }
         }
     }
+
+};
+
+//specially designed for signal updating
+class snake : public board{
+public:
+    vector<pair<int, int>> body;
+
+
+    snake() : board() {
+        cells[15][15].type = HEAD;
+        cells[15][16].type = BODY;
+        //cells[5][17].type = BODY;
+        //cells[5][18].type = BODY;
+
+        body.push_back({15, 15});
+        body.push_back({15, 16});
+        //body.push_back({5, 17});
+        //body.push_back({5, 18});
+    }
+
+    void update(){
+        if(dirSpawnTimer < SPEED_TIME){
+            dirSpawnTimer++;
+        if(Keyboard::isKeyPressed(Keyboard::A)){
+            cells[body[0].first][body[0].second].dir = LEFT;
+        } else if(Keyboard::isKeyPressed(Keyboard::D)){
+            cells[body[0].first][body[0].second].dir = RIGHT;
+        } else if(Keyboard::isKeyPressed(Keyboard::W)){
+            cells[body[0].first][body[0].second].dir = UP;
+        } else if(Keyboard::isKeyPressed(Keyboard::S)){
+            cells[body[0].first][body[0].second].dir = DOWN;
+        }
+        // else{
+        //     cells[body[0].first][body[0].second].dir = (head_dir);
+        // }
+            return;
+        }
+
+        dirSpawnTimer = 0;
+
+        int tail_x = body[body.size() - 1].first;
+        int tail_y = body[body.size() - 1].second;
+        direction head_dir = cells[body[0].first][body[0].second].dir;
+        //update position and dir
+        for(size_t i = body.size() - 1; i > 0; i--){
+            body[i] = body[i - 1];
+            cells[body[i].first][body[i].second].dir = cells[body[i - 1].first][body[i - 1].second].dir;
+        }
+        int x = body[0].first;
+        int y = body[0].second;
+        switch (cells[x][y].dir) {
+            case UP:
+                x -= 1;
+                break;
+            case DOWN:
+                x += 1;
+                break;
+            case LEFT:
+                y -= 1;
+                break;
+            case RIGHT:
+                y += 1;
+                break;
+        }
+        body[0].first = x;
+        body[0].second = y;
+
+        //update celltype : only need to update head and tail
+        cells[body[1].first][body[1].second].type = BODY;
+        cells[body[0].first][body[0].second].type = HEAD;
+        cells[tail_x][tail_y].type = EMPTY;
+
+        // headcell direction    
+        if(Keyboard::isKeyPressed(Keyboard::A)){
+            cells[body[0].first][body[0].second].dir = LEFT;
+        } else if(Keyboard::isKeyPressed(Keyboard::D)){
+            cells[body[0].first][body[0].second].dir = RIGHT;
+        } else if(Keyboard::isKeyPressed(Keyboard::W)){
+            cells[body[0].first][body[0].second].dir = UP;
+        } else if(Keyboard::isKeyPressed(Keyboard::S)){
+            cells[body[0].first][body[0].second].dir = DOWN;
+        }
+        else{
+            cells[body[0].first][body[0].second].dir = (head_dir);
+        }
+        //otherwise head-direction remains still
+
+        cout << "x =  " << body[0].first << ", y = " << body[0].second << " , Direction = " <<  static_cast<int>(cells[body[0].first][body[0].second].dir) << endl;
+
+    }
+
+    void draw_head(RenderWindow & window){
+        for(size_t i = 0; i < cells.size(); i++){
+            for(size_t j = 0; j < cells[i].size(); j++){
+                if(cells[i][j].type == BODY){
+                    cells[i][j].shape.setFillColor(Color::Yellow);
+                } else if(cells[i][j].type == FOOD){
+                    cells[i][j].shape.setFillColor(Color::Red);
+                } else if(cells[i][j].type == HEAD){
+                    cells[i][j].shape.setFillColor(Color::Green);
+                } else if(cells[i][j].type == EMPTY){
+                    cells[i][j].shape.setFillColor(Color::White);
+                }
+                // Draw the cell
+            }
+        }
+
+        window.draw(cells[body[0].first][body[0].second].shape);
+    }
+
+
+
+
+    
+
+
 };
 
 int main()
@@ -71,13 +201,16 @@ int main()
 
     RenderWindow window(VideoMode(CELL_SIZE * BOARD_SIZE, CELL_SIZE * BOARD_SIZE), "10x10 Chessboard");
     window.setFramerateLimit(60);
+
+
+
+    Clock clock;
+    float dt;
+    float multiplier = 60.f;
     //DEFINE
 
-    board b;
-    b.cells[0][0].type = HEAD; // Set the head of the snake
-    b.cells[0][1].type = BODY; // Set the body of the snake
-    b.cells[0][2].type = BODY; // Set the body of the snake
-    b.cells[1][2].type = FOOD; // Set the food
+    snake s;
+
 
     while (window.isOpen())
     {
@@ -89,14 +222,15 @@ int main()
             if (event.type == Event::Closed)
                 window.close();
         }
+        dt = clock.restart().asSeconds();
 //UPDATE
-        
+        s.update();
 
 
 
         window.clear(Color::Black);
 //DRAW
-        b.draw(window);
+        s.draw(window);
 
 
 
