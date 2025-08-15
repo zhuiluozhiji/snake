@@ -8,7 +8,7 @@ read commit_message
 # 执行 Git 命令
 git add .
 git commit -m "$commit_message"
-git push origin main
+git push origin master
 
 # 提示完成
 echo "代码已成功提交并推送到远程仓库！"
