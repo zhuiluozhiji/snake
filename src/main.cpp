@@ -86,6 +86,8 @@ public:
             return;
         }
         foodSpawnTimer = 0;
+        //if board is full
+
         while(true){
             int x = rand() % BOARD_SIZE;
             int y = rand() % BOARD_SIZE;
@@ -211,24 +213,7 @@ public:
 
     }
 
-    // void draw_head(RenderWindow & window){
-    //     for(size_t i = 0; i < cells.size(); i++){
-    //         for(size_t j = 0; j < cells[i].size(); j++){
-    //             if(cells[i][j].type == BODY){
-    //                 cells[i][j].shape.setFillColor(Color::Yellow);
-    //             } else if(cells[i][j].type == FOOD){
-    //                 cells[i][j].shape.setFillColor(Color::Red);
-    //             } else if(cells[i][j].type == HEAD){
-    //                 cells[i][j].shape.setFillColor(Color::Green);
-    //             } else if(cells[i][j].type == EMPTY){
-    //                 cells[i][j].shape.setFillColor(Color::White);
-    //             }
-    //             // Draw the cell
-    //         }
-    //     }
 
-    //     window.draw(cells[body[0].first][body[0].second].shape);
-    // }
 
 };
 
