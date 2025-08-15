@@ -20,4 +20,4 @@ make || { echo "编译失败！"; exit 1; }
 echo "编译完成！可执行文件位于 build/bin 目录中。"
 
 cd .. # 切换到脚本所在目录，即项目根目录,避免load图片资源等相对路径错误
-./build/bin/main
+./build/bin/snake
