@@ -14,6 +14,7 @@
 
 class food {
 public:
+    
     board& b;
     food(board& b);
     void make_food();

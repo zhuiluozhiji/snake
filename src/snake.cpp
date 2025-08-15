@@ -20,6 +20,34 @@ snake::snake(board& b) : b(b) {
     body.push_back({15, 18});
 }
 
+
+void snake::failure_dect(int x, int y){// x,y is the newly arrived pos of head
+    if(x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE){
+        cout << "Game Over! You hit the wall!" << endl;
+        exit(0);
+        return;
+    }
+    for(size_t i = 1; i < body.size(); i++){
+        if(body[i].first == x && body[i].second == y){
+            cout << "Game Over! You hit yourself!" << endl;
+            exit(0);
+            return;
+        }
+    }
+}
+
+void snake::eat(int x, int y, int tail_x, int tail_y){// x,y is the newly arrived pos of head
+    //eat detection
+    if(b.cells[x][y].type == FOOD){
+        body.push_back({tail_x, tail_y}); // add a new body segment at the tail position
+        b.cells[tail_x][tail_y].type = BODY; // update the tail cell type to BODY
+    } else {
+        // if not eating, just update tail position
+        b.cells[tail_x][tail_y].type = EMPTY;
+    }
+    //b.cells[tail_x][tail_y].dir remains still!! 继承前尾巴的方向
+}
+
 void snake::update(){
 // last pressed key during the round just ended
     if(dirSpawnTimer < SPEED_TIME){
@@ -44,7 +72,7 @@ void snake::update(){
     //update position and dir
     for(size_t i = body.size() - 1; i > 0; i--){
         body[i] = body[i - 1];
-        b.cells[body[i].first][body[i].second].dir = b.cells[body[i - 1].first][body[i - 1].second].dir;
+        //b.cells[body[i].first][body[i].second].dir = b.cells[body[i - 1].first][body[i - 1].second].dir;
     }
     int x = body[0].first;// temporary head x(may fail to exit)
     int y = body[0].second;// temporary head y
@@ -64,30 +92,13 @@ void snake::update(){
     }
 
 //failure detection
-    if(x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE){
-        cout << "Game Over! You hit the wall!" << endl;
-        exit(0);
-        return;
-    }
-    for(size_t i = 1; i < body.size(); i++){
-        if(body[i].first == x && body[i].second == y){
-            cout << "Game Over! You hit yourself!" << endl;
-            exit(0);
-            return;
-        }
-    }
+    failure_dect(x, y);
 //success moving
     body[0].first = x;
     body[0].second = y;
-//eat detection
-    if(b.cells[x][y].type == FOOD){
-        body.push_back({tail_x, tail_y}); // add a new body segment at the tail position
-        b.cells[tail_x][tail_y].type = BODY; // update the tail cell type to BODY
-    } else {
-        // if not eating, just update tail position
-        b.cells[tail_x][tail_y].type = EMPTY;
-    }
 
+
+    eat(x, y, tail_x, tail_y); // check if eating food and update body
 
 
     //update celltype : only need to update head and tail

@@ -20,6 +20,9 @@ public:
 
     snake(board& b);
 
+    void failure_dect(int x, int y); //failure detection
+    void eat(int x, int y, int tail_x, int tail_y);    //eat detection
     void update();
+    
 
 };
