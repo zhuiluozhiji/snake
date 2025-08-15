@@ -6,7 +6,7 @@
 using namespace sf;
 using namespace std;
 
-cell::cell(celltype t , direction d) : type(t), dir(d) {
+cell::cell(celltype t , direction d) : type(t), dir(d), score_val(0) {
     shape.setSize(Vector2f(CELL_SIZE, CELL_SIZE));
     shape.setFillColor(Color::Magenta);
 }
@@ -27,8 +27,10 @@ void board::draw(RenderWindow& window){
         for(size_t j = 0; j < cells[i].size(); j++){
             if(cells[i][j].type == BODY){
                 cells[i][j].shape.setFillColor(Color::Yellow);
-            } else if(cells[i][j].type == FOOD){
+            } else if(cells[i][j].type == APPLE){
                 cells[i][j].shape.setFillColor(Color::Red);
+            } else if(cells[i][j].type == BONUS){
+                cells[i][j].shape.setFillColor(Color::Blue);
             } else if(cells[i][j].type == HEAD){
                 cells[i][j].shape.setFillColor(Color::Green);
             } else if(cells[i][j].type == EMPTY){

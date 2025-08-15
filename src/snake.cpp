@@ -1,6 +1,7 @@
 #include "../include/snake.h"
 
 extern int dirSpawnTimer;
+extern int score;
 
 
 using namespace sf;
@@ -38,9 +39,10 @@ void snake::failure_dect(int x, int y){// x,y is the newly arrived pos of head
 
 void snake::eat(int x, int y, int tail_x, int tail_y){// x,y is the newly arrived pos of head
     //eat detection
-    if(b.cells[x][y].type == FOOD){
+    if(b.cells[x][y].type == APPLE || b.cells[x][y].type == BONUS){
         body.push_back({tail_x, tail_y}); // add a new body segment at the tail position
         b.cells[tail_x][tail_y].type = BODY; // update the tail cell type to BODY
+        score += b.cells[x][y].score_val; // update score
     } else {
         // if not eating, just update tail position
         b.cells[tail_x][tail_y].type = EMPTY;
@@ -120,7 +122,7 @@ void snake::update(){
     }
 
 
-    cout << "x =  " << body[0].first << ", y = " << body[0].second << " , Direction = " <<  static_cast<int>(b.cells[body[0].first][body[0].second].dir) << endl;
+    cout << "x =  " << body[0].first << ", y = " << body[0].second << " , Direction = " <<  static_cast<int>(b.cells[body[0].first][body[0].second].dir) << ",  score = " << score << endl;
 
 }
 

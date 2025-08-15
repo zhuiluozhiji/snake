@@ -5,7 +5,9 @@
 
 int dirSpawnTimer = 0;
 int foodSpawnTimer = 0;
+int bonusSpawnCounter = 0;
 
+int score = 0;
 
 
 using namespace sf;

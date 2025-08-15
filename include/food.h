@@ -14,8 +14,12 @@
 
 class food {
 public:
-    
     board& b;
+    bool bonus_live;
+    int bonus_score;
+    int bonus_live_time;
+    std::pair<int, int> bonus_position;
     food(board& b);
+    void food_pos(celltype t = APPLE);
     void make_food();
 };

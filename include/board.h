@@ -13,14 +13,19 @@
 #define BOARD_SIZE 20
 #define CELL_SIZE 40
 #define SPEED_TIME 5
-
+#define FOOD_SPAWN_TIME 200
+#define BONUS_SPAWN_COUNT 5
+#define BONUS_LIVE_TIME 800
+#define BONUS_GRADE 4
+#define BONUS_MAX_SCORE 16
 
 
 
 enum celltype{
     EMPTY,
     BODY,
-    FOOD,
+    APPLE,
+    BONUS,
     HEAD
 };
 
@@ -33,6 +38,7 @@ enum direction{
 
 class cell{
 public:
+    int score_val; 
     celltype type;
     direction dir;
     sf::RectangleShape shape;
