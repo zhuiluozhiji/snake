@@ -4,6 +4,7 @@ extern int dirSpawnTimer;
 extern int score;
 
 
+
 using namespace sf;
 using namespace std;
 
@@ -22,19 +23,22 @@ snake::snake(board& b) : b(b) {
 }
 
 
-void snake::failure_dect(int x, int y){// x,y is the newly arrived pos of head
-    if(x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE){
-        cout << "Game Over! You hit the wall!" << endl;
-        exit(0);
-        return;
-    }
+bool snake::failure_dect(int & x, int & y){// x,y is the newly arrived pos of head
+
+    if(x < 0) x = BOARD_SIZE - 1;
+    else if(x >= BOARD_SIZE) x = 0;
+    else if(y < 0) y = BOARD_SIZE - 1;
+    else if(y >= BOARD_SIZE) y = 0;
+     
+    
     for(size_t i = 1; i < body.size(); i++){
         if(body[i].first == x && body[i].second == y){
             cout << "Game Over! You hit yourself!" << endl;
-            exit(0);
-            return;
+            UI::failure();
+            return true;
         }
     }
+    return false;
 }
 
 void snake::eat(int x, int y, int tail_x, int tail_y){// x,y is the newly arrived pos of head
@@ -94,7 +98,7 @@ void snake::update(){
     }
 
 //failure detection
-    failure_dect(x, y);
+    if(failure_dect(x, y)) return;
 //success moving
     body[0].first = x;
     body[0].second = y;

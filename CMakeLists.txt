@@ -12,6 +12,7 @@ add_executable(snake
     src/board.cpp
     src/snake.cpp
     src/food.cpp
+    src/UI.cpp
 )
 
 target_compile_features(snake PRIVATE cxx_std_17)

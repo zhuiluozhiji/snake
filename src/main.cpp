@@ -1,6 +1,8 @@
 #include "../include/board.h"
 #include "../include/snake.h"
 #include "../include/food.h"
+#include "../include/UI.h"
+#include "../include/UI.h"
 
 
 int dirSpawnTimer = 0;
@@ -9,21 +11,24 @@ int bonusSpawnCounter = 0;
 
 int score = 0;
 
+bool paused = false;
+bool game_over = false;
+
 
 using namespace sf;
 using namespace std;
 
 
+RenderWindow window(VideoMode(CELL_SIZE * BOARD_SIZE, CELL_SIZE * BOARD_SIZE), "10x10 Chessboard");
 
 
 int main()
 {
     // Initialize a random seed (only call once at the beginning of the program)
     srand(time(0));
-    RenderWindow window(VideoMode(CELL_SIZE * BOARD_SIZE, CELL_SIZE * BOARD_SIZE), "10x10 Chessboard");
+
+
     window.setFramerateLimit(60);
-
-
 
     Clock clock;
     float dt;
@@ -32,7 +37,7 @@ int main()
     board gb;
     snake s(gb);
     food f(gb);
-
+    UI::init(); // Initialize UI static members
 
     while (window.isOpen())
     {
@@ -43,19 +48,23 @@ int main()
             
             if (event.type == Event::Closed)
                 window.close();
+            if (event.type == Event::KeyPressed && event.key.code == Keyboard::Space)
+                paused = !paused; // 按P键切换暂停状态
         }
         dt = clock.restart().asSeconds();
 //UPDATE
-        s.update();
-        f.make_food();
+        if(!paused && !game_over){
+            s.update();
+            f.make_food();
+        }
 
 
 
         window.clear(Color::Black);
 //DRAW
         gb.draw(window);
-
-
+        UI::show_score();
+        if(game_over) UI::failure();
 
         window.display();
     }
