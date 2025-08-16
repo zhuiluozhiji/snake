@@ -5,7 +5,7 @@ using namespace std;
 
 extern int score;
 extern RenderWindow window;
-extern bool game_over;
+extern GameState state;
 
 
 // 静态成员变量定义（必须加上类名和作用域）
@@ -26,8 +26,8 @@ void UI::init() {
     score_text.setStyle(Text::Bold);
 
     failure_text.setFont(font);
-    failure_text.setCharacterSize(48);
-    failure_text.setString("Game Over!");
+    failure_text.setCharacterSize(40);
+    failure_text.setString("                    Game Over! \n You can press Enter or click to restart. ");
     failure_text.setFillColor(Color::Red);
     failure_text.setPosition(BOARD_SIZE * CELL_SIZE / 2 - failure_text.getGlobalBounds().width / 2, BOARD_SIZE * CELL_SIZE / 2 - failure_text.getGlobalBounds().height / 2);
 }
@@ -37,6 +37,6 @@ void UI::show_score(){
     window.draw(score_text);
 }
 void UI::failure(){
-    game_over = true;
+    state = GAME_OVER; // Set the game state to GAME_OVER
     window.draw(failure_text);
 }

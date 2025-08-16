@@ -12,11 +12,16 @@ int bonusSpawnCounter = 0;
 int score = 0;
 
 bool paused = false;
-bool game_over = false;
+
 
 
 using namespace sf;
 using namespace std;
+
+
+
+
+GameState state = START;
 
 
 RenderWindow window(VideoMode(CELL_SIZE * BOARD_SIZE, CELL_SIZE * BOARD_SIZE), "10x10 Chessboard");
@@ -34,9 +39,9 @@ int main()
     float dt;
     float multiplier = 60.f;
     //DEFINE
-    board gb;
-    snake s(gb);
-    food f(gb);
+    board* gb = new board();
+    snake* s = new snake(*gb);
+    food* f = new food(*gb);
     UI::init(); // Initialize UI static members
 
     while (window.isOpen())
@@ -48,23 +53,79 @@ int main()
             
             if (event.type == Event::Closed)
                 window.close();
-            if (event.type == Event::KeyPressed && event.key.code == Keyboard::Space)
-                paused = !paused; // 按P键切换暂停状态
+            if (state == START) {
+                // 鼠标点击或按键进入游戏
+                if (event.type == Event::KeyPressed && event.key.code == Keyboard::Enter) {
+                    state = PLAYING;
+                }
+                if (event.type == Event::MouseButtonPressed) {
+                    state = PLAYING;
+                }
+            }
+            else if (state == PLAYING) {
+                if (event.type == Event::KeyPressed && event.key.code == Keyboard::Space)
+                    paused = !paused;
+            }
+            else if(state == GAME_OVER){
+                if (event.type == Event::KeyPressed && event.key.code == Keyboard::Enter) {
+                    // 释放旧对象
+                    delete gb;
+                    delete s;
+                    delete f;
+                    // 创建新对象
+                    gb = new board();
+                    s = new snake(*gb);
+                    f = new food(*gb);
+                    state = PLAYING;
+                    score = 0;
+                }
+                if (event.type == Event::MouseButtonPressed) {
+                    // 释放旧对象
+                    delete gb;
+                    delete s;
+                    delete f;
+                    // 创建新对象
+                    gb = new board();
+                    s = new snake(*gb);
+                    f = new food(*gb);
+                    state = PLAYING;
+                    score = 0;
+                }                
+
+            }
         }
-        dt = clock.restart().asSeconds();
-//UPDATE
-        if(!paused && !game_over){
-            s.update();
-            f.make_food();
+        window.clear(Color::White);
+//UPDATE and DRAW
+        if (state == START) {
+            // 绘制开始界面
+            sf::Font font;
+            font.loadFromFile("Fonts/weiruanyahei.ttf");
+            sf::Text start_text("Press Enter or Click to Start", font, 36);
+            start_text.setFillColor(sf::Color::Blue);
+            start_text.setPosition(BOARD_SIZE * CELL_SIZE / 2 - start_text.getGlobalBounds().width / 2,
+                                   BOARD_SIZE * CELL_SIZE / 2 - start_text.getGlobalBounds().height / 2);
+            window.draw(start_text);
+        } else if (state == PLAYING) {
+            dt = clock.restart().asSeconds();
+            if(!paused) {
+                s->update();
+                f->make_food();
+            }
+            gb->draw(window);
+            UI::show_score();
+
         }
+        else if(state == GAME_OVER){
+            gb->draw(window);
+            UI::show_score();
+            UI::failure();
+            
+        } 
 
 
 
-        window.clear(Color::Black);
-//DRAW
-        gb.draw(window);
-        UI::show_score();
-        if(game_over) UI::failure();
+
+
 
         window.display();
     }

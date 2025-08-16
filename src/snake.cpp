@@ -34,7 +34,7 @@ bool snake::failure_dect(int & x, int & y){// x,y is the newly arrived pos of he
     for(size_t i = 1; i < body.size(); i++){
         if(body[i].first == x && body[i].second == y){
             cout << "Game Over! You hit yourself!" << endl;
-            UI::failure();
+            UI::failure(); // Show failure message
             return true;
         }
     }

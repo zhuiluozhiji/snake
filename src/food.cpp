@@ -30,17 +30,17 @@ void food::food_pos(celltype t){
 void food::make_food(){//it is the one to be called in main function
     if(bonus_live){
         bonus_live_time++;
-        if(bonus_live_time <= 200){
+        if(bonus_live_time <= BONUS_LIVE_TIME / 4){
             bonus_score = BONUS_MAX_SCORE; // bonus food gives more score
         }
-        else if(bonus_live_time <= 400){
-            bonus_score = 12; // bonus food gives less score
+        else if(bonus_live_time <= BONUS_LIVE_TIME / 2){
+            bonus_score = BONUS_MAX_SCORE / 2; // bonus food gives less score
         }
-        else if(bonus_live_time <= 600){
-            bonus_score = 8; // bonus food gives even less score
+        else if(bonus_live_time <= BONUS_LIVE_TIME * 3 / 4){
+            bonus_score = BONUS_MAX_SCORE / 4; // bonus food gives even less score
         }
-        else if(bonus_live_time <= 800) {
-            bonus_score = 4; // after bonus time, it becomes normal food
+        else if(bonus_live_time <= BONUS_LIVE_TIME) {
+            bonus_score = 2; // after bonus time, it becomes normal food
         }
         else if(bonus_live_time > BONUS_LIVE_TIME){
             bonus_live = false;
